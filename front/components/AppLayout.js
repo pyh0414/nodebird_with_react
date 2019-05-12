@@ -20,8 +20,12 @@ const AppLayout = ({ children }) => {
           <Input.Search enterButton style={{ verticalAlign: "middle" }} />
         </Menu.Item>
       </Menu>
+      <Link href="/signup">
+        <a>
+          <Button>회원가입</Button>
+        </a>
+      </Link>
       {children}
-      <Button>회원가입</Button>
     </div>
   );
 };
