@@ -1,6 +1,7 @@
 import React from "react";
 import Head from "next/head";
 import AppLayout from "../components/AppLayout";
+import PropsTypes from "prop-types";
 
 const NodeBird = ({ Component }) => {
   return (
@@ -18,6 +19,10 @@ const NodeBird = ({ Component }) => {
       </AppLayout>
     </>
   );
+};
+
+NodeBird.PropsTypes = {
+  Component: PropsTypes.node // node : jsx에 들어갈 수 있는 모든 것들
 };
 
 export default NodeBird;
