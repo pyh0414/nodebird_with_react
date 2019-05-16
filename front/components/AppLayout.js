@@ -1,18 +1,14 @@
 import React from "react";
 import Link from "next/link";
-import PropsTypes from "prop-types";
-import { Menu, Input, Button, Row, Col, Card, Avatar, Form } from "antd";
+import PropTypes from "prop-types";
+import { Col, Input, Menu, Row } from "antd";
+import { useSelector } from "react-redux";
 
 import LoginForm from "./LoginForm";
-const dummy = {
-  nickname: "박연호",
-  Post: [1, 2, 3, 4, 5],
-  Followings: [1, 2, 3],
-  Follower: [1, 2, 3],
-  isLoggedIn: false
-};
+import UserProfile from "./UserProfile";
 
 const AppLayout = ({ children }) => {
+  const { isLoggedIn } = useSelector(state => state.user);
   return (
     <div>
       <Menu mode="horizontal">
@@ -21,7 +17,7 @@ const AppLayout = ({ children }) => {
             <a>노드버드</a>
           </Link>
         </Menu.Item>
-        <Menu.Item key="home">
+        <Menu.Item key="profile">
           <Link href="/profile">
             <a>프로필</a>
           </Link>
@@ -30,51 +26,25 @@ const AppLayout = ({ children }) => {
           <Input.Search enterButton style={{ verticalAlign: "middle" }} />
         </Menu.Item>
       </Menu>
-      <Row>
+      <Row gutter={8}>
         <Col xs={24} md={6}>
-          {dummy.isLoggedIn ? (
-            <Card
-              actions={[
-                <div key="twit">
-                  짹짹
-                  <br />
-                  {dummy.Post.length}
-                </div>,
-                <div key="following">
-                  짹짹
-                  <br />
-                  {dummy.Followings.length}
-                </div>,
-                <div key="follower">
-                  짹짹
-                  <br />
-                  {dummy.Follower.length}
-                </div>
-              ]}
-            >
-              <Card.Meta
-                avatar={<Avatar>{dummy.nickname[0]}</Avatar>}
-                title={dummy.nickname}
-              />
-            </Card>
-          ) : (
-            <LoginForm />
-          )}
+          {isLoggedIn ? <UserProfile /> : <LoginForm />}
         </Col>
-
         <Col xs={24} md={12}>
           {children}
         </Col>
         <Col xs={24} md={6}>
-          세번째
+          <Link href="https://www.zerocho.com">
+            <a target="_blank">Made by ZeroCho</a>
+          </Link>
         </Col>
       </Row>
     </div>
   );
 };
 
-AppLayout.PropsTypes = {
-  children: PropsTypes.node
+AppLayout.propTypes = {
+  children: PropTypes.node
 };
 
 export default AppLayout;
