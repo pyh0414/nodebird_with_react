@@ -2,27 +2,45 @@ import React from "react";
 import Head from "next/head";
 import AppLayout from "../components/AppLayout";
 import PropsTypes from "prop-types";
+import withRedux from "next-redux-wrapper";
+import { createStore, applyMiddleware, compose } from "redux";
+import { Provider } from "react-redux";
+import rootReducer from "../reducers";
 
-const NodeBird = ({ Component }) => {
+const NodeBird = ({ Component, store }) => {
+  // compoenent가 index,profile,signup을 모두 포함하고 있음
   return (
     <>
-      <Head>
-        <title>NodeBird</title>
-        <link
-          rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css"
-        />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.js" />
-      </Head>
-      <AppLayout>
-        <Component />
-      </AppLayout>
+      <Provider store={store}>
+        <Head>
+          <title>NodeBird</title>
+          <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css"
+          />
+          <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.js" />
+        </Head>
+        <AppLayout>
+          <Component />
+        </AppLayout>
+      </Provider>
     </>
   );
 };
 
 NodeBird.PropsTypes = {
-  Component: PropsTypes.node // node : jsx에 들어갈 수 있는 모든 것들
+  Component: PropsTypes.node, // node : jsx에 들어갈 수 있는 모든 것
+  store: PropsTypes.object
 };
 
-export default NodeBird;
+export default withRedux((initialState, options) => {
+  const middlewares = []; // 추가하려는 middleware를 배열에 넣으면됨
+  const enhancer = compose(
+    applyMiddleware(...middlewares),
+    !options.isServer && window.__REDUX_DEVTOOLS_EXTENSION__ !== "undefined"
+      ? window.__REDUX_DEVTOOLS_EXTENSION__()
+      : f => f
+  );
+  const store = createStore(rootReducer, initialState, enhancer);
+  return store;
+})(NodeBird); // withRedux를 사용해서 nodeBird에 sotre를 넣어주는 부분
