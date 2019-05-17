@@ -1,6 +1,9 @@
 import React, { useState, useCallback, memo } from "react";
-import AppLayout from "../components/AppLayout";
 import { Form, Input, Checkbox, Button } from "antd";
+import { useDispatch } from "react-redux";
+
+import AppLayout from "../components/AppLayout";
+import { signUpAction } from "../reducers/user";
 
 export const useInput = (initValue = null) => {
   const [value, setter] = useState(initValue);
@@ -24,6 +27,8 @@ const Signup = () => {
   const [nick, onChangeNick] = useInput("");
   const [password, onChangePassword] = useInput("");
 
+  const dispatch = useDispatch();
+
   const onSubmit = useCallback(
     e => {
       e.preventDefault();
@@ -33,6 +38,13 @@ const Signup = () => {
       if (!term) {
         return setTermError(true);
       }
+      dispatch(
+        signUpAction({
+          id,
+          password,
+          nick
+        })
+      );
     },
     [password, passwordCheck, term]
   );
