@@ -1,11 +1,14 @@
 import React from "react";
 import Head from "next/head";
-import AppLayout from "../components/AppLayout";
 import PropsTypes from "prop-types";
 import withRedux from "next-redux-wrapper";
 import { createStore, applyMiddleware, compose } from "redux";
 import { Provider } from "react-redux";
+import createSagaMiddleware from "redux-saga";
+
 import rootReducer from "../reducers";
+import AppLayout from "../components/AppLayout";
+import rootSaga from "../sagas";
 
 const NodeBird = ({ Component, store }) => {
   // compoenent가 index,profile,signup을 모두 포함하고 있음
@@ -29,18 +32,24 @@ const NodeBird = ({ Component, store }) => {
 };
 
 NodeBird.PropsTypes = {
-  Component: PropsTypes.node, // node : jsx에 들어갈 수 있는 모든 것
-  store: PropsTypes.object
+  Component: PropsTypes.node.isRequired, // node : jsx에 들어갈 수 있는 모든 것
+  store: PropsTypes.object.isRequired
 };
 
 export default withRedux((initialState, options) => {
-  const middlewares = []; // 추가하려는 middleware를 배열에 넣으면됨
-  const enhancer = compose(
-    applyMiddleware(...middlewares),
-    !options.isServer && window.__REDUX_DEVTOOLS_EXTENSION__ !== "undefined"
-      ? window.__REDUX_DEVTOOLS_EXTENSION__()
-      : f => f
-  );
+  const sagaMiddleware = createSagaMiddleware();
+  const middlewares = [sagaMiddleware]; // 추가하려는 middleware를 배열에 넣으면됨
+  const enhancer =
+    process.env.NODE_ENV === "production"
+      ? compose(applyMiddleware(...middlewares))
+      : compose(
+          applyMiddleware(...middlewares),
+          !options.isServer &&
+            window.__REDUX_DEVTOOLS_EXTENSION__ !== "undefined"
+            ? window.__REDUX_DEVTOOLS_EXTENSION__()
+            : f => f
+        );
   const store = createStore(rootReducer, initialState, enhancer);
+  sagaMiddleware.run(rootSaga);
   return store;
 })(NodeBird); // withRedux를 사용해서 nodeBird에 sotre를 넣어주는 부분
