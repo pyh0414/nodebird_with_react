@@ -1,9 +1,15 @@
-import React, { useState, useCallback, memo } from "react";
-import { Form, Input, Checkbox, Button } from "antd";
+import React, { useCallback, useState, useEffect } from "react";
+import { Button, Checkbox, Form, Input } from "antd";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-
-import AppLayout from "../components/AppLayout";
+import Router from "next/router";
 import { SIGN_UP_REQUEST } from "../reducers/user";
+
+const TextInput = ({ value }) => <div>{value}</div>;
+
+TextInput.propTypes = {
+  value: PropTypes.string
+};
 
 export const useInput = (initValue = null) => {
   const [value, setter] = useState(initValue);
@@ -14,21 +20,23 @@ export const useInput = (initValue = null) => {
 };
 
 const Signup = () => {
-  const { isSigningUp } = useSelector(state => state.user);
   const [passwordCheck, setPasswordCheck] = useState("");
   const [term, setTerm] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
   const [termError, setTermError] = useState(false);
 
-  // const TextIput = memo(({ value, onChange }) => {
-  //   return <Input name="user-id" value={value} onChange={onChange} />;  // pureComponenet를 적용해서 re-rendering안되게
-  // });
-
   const [id, onChangeId] = useInput("");
   const [nick, onChangeNick] = useInput("");
   const [password, onChangePassword] = useInput("");
-
   const dispatch = useDispatch();
+  const { isSigningUp, me } = useSelector(state => state.user);
+
+  useEffect(() => {
+    if (me) {
+      alert("로그인했으니 메인페이지로 이동합니다.");
+      Router.push("/");
+    }
+  }, [me && me.id]);
 
   const onSubmit = useCallback(
     e => {
@@ -42,9 +50,9 @@ const Signup = () => {
       return dispatch({
         type: SIGN_UP_REQUEST,
         data: {
-          userId: id,
+          id,
           password,
-          nickname: nick
+          nick
         }
       });
     },
@@ -67,11 +75,11 @@ const Signup = () => {
   return (
     <>
       <Form onSubmit={onSubmit} style={{ padding: 10 }}>
+        <TextInput value="135135" />
         <div>
           <label htmlFor="user-id">아이디</label>
           <br />
           <Input name="user-id" value={id} required onChange={onChangeId} />
-          {/* <TextIput value={id} onChange={onChangeId} /> */}
         </div>
         <div>
           <label htmlFor="user-nick">닉네임</label>
