@@ -18,18 +18,22 @@ import {
   SIGN_UP_SUCCESS
 } from "../reducers/user";
 
-function loginAPI() {
+// axios.defaults.baseURL = "http://localhost:3065/api";
+
+function logInAPI(loginData) {
   // 서버에 요청을 보내는 부분
-  return axios.post("/login");
+  return axios.post("http://localhost:3065/api/user/login", loginData, {
+    withCredentials: true
+  });
 }
 
-function* login() {
+function* login(action) {
   try {
-    // yield call(loginAPI);
-    yield delay(2000);
+    const result = yield call(logInAPI, action.data); // axios의 응답 받음
     yield put({
       // put은 dispatch 동일
-      type: LOG_IN_SUCCESS
+      type: LOG_IN_SUCCESS,
+      data: result.data // reducer
     });
   } catch (e) {
     // loginAPI 실패
@@ -44,16 +48,16 @@ function* watchLogin() {
   yield takeEvery(LOG_IN_REQUEST, login);
 }
 
-function signUpAPI() {
+function signUpAPI(signUpData) {
+  // call함수의 두번째 인자
   // 서버에 요청을 보내는 부분
-  return axios.post("/login");
+  return axios.post("http://localhost:3065/api/user", signUpData);
 }
 
-function* signUp() {
+function* signUp(action) {
+  // action : form에서 넘어온 값
   try {
-    // yield call(signUpAPI);
-    yield delay(2000);
-    throw new Error("에러에러에러");
+    yield call(signUpAPI, action.data);
     yield put({
       // put은 dispatch 동일
       type: SIGN_UP_SUCCESS
