@@ -56,7 +56,21 @@ const PostCard = ({ post }) => {
         <Card.Meta
           avatar={<Avatar>{post.User.nickname[0]}</Avatar>}
           title={post.User.nickname}
-          description={post.content}
+          description={
+            <div>
+              {post.content.split(/(#[^\s]+)/g).map(v => {
+                if (v.match(/#[^\s]+/)) {
+                  return (
+                    <Link href="/hashtag/">
+                      <a>{v}</a>
+                    </Link>
+                  );
+                } else {
+                  return v;
+                }
+              })}
+            </div>
+          }
         />
       </Card>
       {commentFormOpened && (
