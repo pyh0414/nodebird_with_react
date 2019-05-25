@@ -9,22 +9,30 @@ const PostForm = () => {
   );
   const dispatch = useDispatch();
   const [text, setText] = useState("");
-  const onSubmitForm = useCallback(e => {
-    e.preventDeafult();
-    dispatch({
-      type: ADD_POST_REQUEST,
-      data: {
-        text
-      }
-    });
-  }, []);
-  const onChangeText = useCallback(e => {
-    setText(e.target.value);
-  });
 
   useEffect(() => {
     setText("");
   }, [postAdded === true]);
+
+  const onSubmitForm = useCallback(
+    e => {
+      if (!text || !text.trim()) {
+        return alert("게시글을 작성해 주세요."); // return안하면 밑에꺼가기 실행됨
+      }
+      e.preventDefault();
+      dispatch({
+        type: ADD_POST_REQUEST,
+        data: {
+          content: text
+        }
+      });
+    },
+    [text]
+  );
+  const onChangeText = useCallback(e => {
+    setText(e.target.value);
+  });
+
   return (
     <Form
       style={{ margin: "10px 0 20px" }}
@@ -46,7 +54,7 @@ const PostForm = () => {
           htmlType="submit"
           loading={isAddingPost}
         >
-          짹짹
+          쨱짹
         </Button>
       </div>
       <div>
