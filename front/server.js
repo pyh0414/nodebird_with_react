@@ -30,7 +30,13 @@ app.prepare().then(() => {
       name: "pyh"
     })
   );
+  server.get("/hashtag/:tag", (req, res) => {
+    return app.render(req, res, "/hashtag", { tag: req.params.tag }); // 페이지의 /hash가 보여짐
+  });
 
+  server.get("/user/:id", (req, res) => {
+    return app.render(req, res, "/user", { id: req.params.id });
+  });
   server.get("*", (req, res) => {
     return handle(req, res);
   });

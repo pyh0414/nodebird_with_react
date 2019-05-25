@@ -36,6 +36,18 @@ NodeBird.PropsTypes = {
   store: PropsTypes.object.isRequired
 };
 
+NodeBird.getInitialProps = async context => {
+  // context는 next에서 내려주는 얘
+  console.log(context);
+  const { ctx, Component } = context;
+  let pageProps = {};
+  if (Component.getInitialProps) {
+    // hashtag컴포넌트에 getInitialProps이 있으면 실행
+    pageProps = await Component.getInitialProps(ctx); // ctx는 hashtag의 getInitialProps의 cotext로 전달됨
+  }
+  return { pageProps };
+};
+
 export default withRedux((initialState, options) => {
   const sagaMiddleware = createSagaMiddleware();
   const middlewares = [sagaMiddleware]; // 추가하려는 middleware를 배열에 넣으면됨
