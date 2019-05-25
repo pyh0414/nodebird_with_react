@@ -10,7 +10,7 @@ import rootReducer from "../reducers";
 import AppLayout from "../components/AppLayout";
 import rootSaga from "../sagas";
 
-const NodeBird = ({ Component, store }) => {
+const NodeBird = ({ Component, store, pageProps }) => {
   // compoenent가 index,profile,signup을 모두 포함하고 있음
   return (
     <>
@@ -24,7 +24,8 @@ const NodeBird = ({ Component, store }) => {
           <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.js" />
         </Head>
         <AppLayout>
-          <Component />
+          <Component {...pageProps} />
+          {/* hashtag의 props로 전달됨 */}
         </AppLayout>
       </Provider>
     </>
@@ -33,19 +34,19 @@ const NodeBird = ({ Component, store }) => {
 
 NodeBird.PropsTypes = {
   Component: PropsTypes.node.isRequired, // node : jsx에 들어갈 수 있는 모든 것
-  store: PropsTypes.object.isRequired
+  store: PropsTypes.object.isRequired,
+  pageProps: PropsTypes.object.isRequired
 };
 
 NodeBird.getInitialProps = async context => {
   // context는 next에서 내려주는 얘
-  console.log(context);
   const { ctx, Component } = context;
   let pageProps = {};
   if (Component.getInitialProps) {
     // hashtag컴포넌트에 getInitialProps이 있으면 실행
-    pageProps = await Component.getInitialProps(ctx); // ctx는 hashtag의 getInitialProps의 cotext로 전달됨
+    pageProps = await Component.getInitialProps(ctx); // hashtag에서 return 한 값이 pageProps에 들어감:tag
   }
-  return { pageProps };
+  return { pageProps }; // 다시 NodeBird의 props로 전달
 };
 
 export default withRedux((initialState, options) => {
