@@ -4,7 +4,8 @@ import ProtoType from "prop-types";
 import { Avatar, Card } from "antd";
 
 import PostCard from "../components/PostCard";
-import { LOAD_USER_POSTS_REQUEST, LOAD_USER_REQUEST } from "../reducers/post";
+import { LOAD_USER_POSTS_REQUEST } from "../reducers/post";
+import { LOAD_USER_REQUEST } from "../reducers/user";
 
 const User = ({ id }) => {
   const dispatch = useDispatch();
