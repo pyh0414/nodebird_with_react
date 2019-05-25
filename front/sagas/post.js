@@ -136,11 +136,75 @@ function* watchLoadMainPosts() {
 
 // -----------------------------loadMainPosts
 
+function addCommentAPI(data) {
+  return axios.post(
+    `/post/${data.postId}/comment`,
+    { content: data.content },
+    {
+      withCredentials: true
+    }
+  );
+}
+
+function* addComment(action) {
+  try {
+    const result = yield call(addCommentAPI, action.data);
+    yield put({
+      type: ADD_COMMENT_SUCCESS,
+      data: {
+        postId: action.data.postId,
+        comment: result.data
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: ADD_COMMENT_FAILURE,
+      error: e
+    });
+  }
+}
+
+function* watchAddComment() {
+  yield takeLatest(ADD_COMMENT_REQUEST, addComment);
+}
+
+// -----------------------------addComment
+
+function loadCommentsAPI(postId) {
+  return axios.get(`/post/${postId}/comments`);
+}
+
+function* loadComments(action) {
+  try {
+    const result = yield call(loadCommentsAPI, action.data);
+    yield put({
+      type: LOAD_COMMENTS_SUCCESS,
+      data: {
+        postId: action.data,
+        comments: result.data
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: LOAD_COMMENTS_FAILURE,
+      error: e
+    });
+  }
+}
+
+function* watchLoadComments() {
+  yield takeLatest(LOAD_COMMENTS_REQUEST, loadComments);
+}
+// -----------------------------loadComment
 export default function* postSaga() {
   yield all([
     fork(watchLoadMainPosts),
     fork(watchAddPost),
     fork(watchLoadUserPosts),
-    fork(watchLoadHashtagsPosts)
+    fork(watchLoadHashtagsPosts),
+    fork(watchAddComment),
+    fork(watchLoadComments)
   ]);
 }
