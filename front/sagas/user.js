@@ -15,8 +15,6 @@ import {
   LOAD_USER_FAILURE
 } from "../reducers/user";
 
-axios.defaults.baseURL = "http://localhost:3065/api";
-
 function logInAPI(loginData) {
   // 서버에 요청을 보내는 부분
   return axios.post("/user/login", loginData, {
@@ -85,7 +83,7 @@ function logOutAPI() {
   );
 }
 
-function* logOut(action) {
+function* logOut() {
   // action : form에서 넘어온 값
   try {
     yield call(logOutAPI);
@@ -113,13 +111,14 @@ function loadUserAPI() {
   return axios.get("/user/", { withCredentials: true });
 }
 
-function* loadUser(action) {
+function* loadUser() {
   // action : form에서 넘어온 값
   try {
-    yield call(loadUserAPI);
+    const result = yield call(loadUserAPI);
     yield put({
       // put은 dispatch 동일
-      type: LOAD_USER_SUCCESS
+      type: LOAD_USER_SUCCESS,
+      data: result.data
     });
   } catch (e) {
     // loginAPI 실패

@@ -1,17 +1,16 @@
 import { all, fork, takeLatest, put, delay, call } from "redux-saga/effects";
 import axios from "axios";
-import {
-  ADD_POST_FAILURE,
-  ADD_POST_REQUEST,
-  ADD_POST_SUCCESS
-} from "../reducers/post";
+
 import {
   ADD_COMMENT_FAILURE,
   ADD_COMMENT_REQUEST,
   ADD_COMMENT_SUCCESS,
   LOAD_MAIN_POSTS_FAILURE,
   LOAD_MAIN_POSTS_REQUEST,
-  LOAD_MAIN_POSTS_SUCCESS
+  LOAD_MAIN_POSTS_SUCCESS,
+  ADD_POST_FAILURE,
+  ADD_POST_REQUEST,
+  ADD_POST_SUCCESS
 } from "../reducers/post";
 
 function addPostAPI(postData) {
@@ -62,33 +61,6 @@ function* watchLoadMainPosts() {
   yield takeLatest(LOAD_MAIN_POSTS_REQUEST, loadMainPosts);
 }
 
-function addCommentAPI() {}
-
-function* addComment(action) {
-  try {
-    yield delay(2000);
-    yield put({
-      type: ADD_COMMENT_SUCCESS,
-      data: {
-        postId: action.data.postId // PostCard에서 넘어온 값
-      }
-    });
-  } catch (e) {
-    yield put({
-      type: ADD_COMMENT_FAILURE,
-      error: e
-    });
-  }
-}
-
-function* watchAddComment() {
-  yield takeLatest(ADD_COMMENT_REQUEST, addComment);
-}
-
 export default function* postSaga() {
-  yield all([
-    fork(watchLoadMainPosts),
-    fork(watchAddPost),
-    fork(watchAddComment)
-  ]);
+  yield all([fork(watchLoadMainPosts), fork(watchAddPost)]);
 }
