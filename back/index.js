@@ -44,7 +44,9 @@ app.use(passport.session());
 db.sequelize.sync();
 passportConfig();
 
+app.use("/api/posts", postsAPIRouter);
 app.use("/api/user", userAPIRouter);
+app.use("/api/post", postAPIRouter);
 
 app.listen(3065, () => {
   console.log("server is running on 8080");
