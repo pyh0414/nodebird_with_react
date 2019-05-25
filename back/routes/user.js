@@ -89,4 +89,61 @@ router.post("/", async (req, res, next) => {
   }
 });
 
+router.get("/:id/posts", async (req, res, next) => {
+  try {
+    const posts = await db.Post.fildAll({
+      where: {
+        useId: parseInt(req.params.id, 10),
+        RetweetId: null
+      },
+      inclue: [
+        {
+          model: db.User,
+          attributes: ["id", "nickname"]
+        }
+      ]
+    });
+    res.json(posts);
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
+router.get("/:id", async (req, res, next) => {
+  try {
+    const user = await db.User.findOne({
+      include: [
+        {
+          model: db.Post,
+          as: "Posts",
+          attributes: ["id"]
+        },
+        {
+          model: db.User,
+          as: "Followings",
+          attributes: ["id"]
+        },
+        {
+          model: db.User,
+          as: "Followers",
+          attributes: ["id"]
+        }
+      ],
+      where: {
+        id: parseInt(req.params.id, 10)
+      },
+      attributes: ["id", "nickname"]
+    });
+    const jsonUser = user.toJSON();
+    jsonUser.Posts = jsonUser.Posts ? jsonUser.Posts.length : 0;
+    jsonUser.Followings = jsonUser.Followings ? jsonUser.Followings.length : 0;
+    jsonUser.Followers = jsonUser.Followers ? jsonUser.Followers.length : 0;
+    res.json(jsonUser);
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+});
+
 module.exports = router;
