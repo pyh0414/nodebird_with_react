@@ -227,6 +227,72 @@ function* watchUploadImages() {
 
 // -----------------------------uploadImage
 
+function unlikePostAPI(postId) {
+  return axios.delete(`/post/${postId}/like`, {
+    withCredentials: true
+  });
+}
+
+function* unlikePost(action) {
+  try {
+    const result = yield call(unlikePostAPI, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: {
+        postId: action.data,
+        userId: result.data.userId
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      error: e
+    });
+  }
+}
+
+function* watchUnlikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unlikePost);
+}
+
+// -----------------------------Unlike Post
+
+function likePostAPI(postId) {
+  return axios.post(
+    `/post/${postId}/like`,
+    {},
+    {
+      withCredentials: true
+    }
+  );
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostAPI, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: {
+        postId: action.data,
+        userId: result.data.userId
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: LIKE_POST_FAILURE,
+      error: e
+    });
+  }
+}
+
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+// -----------------------------like Post
+
 export default function* postSaga() {
   yield all([
     fork(watchLoadMainPosts),
@@ -235,6 +301,9 @@ export default function* postSaga() {
     fork(watchLoadHashtagsPosts),
     fork(watchAddComment),
     fork(watchLoadComments),
-    fork(watchUploadImages)
+    fork(watchUploadImages),
+
+    fork(watchLikePost),
+    fork(watchUnlikePost)
   ]);
 }

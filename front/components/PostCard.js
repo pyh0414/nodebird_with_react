@@ -5,7 +5,12 @@ import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 
 import PostImages from "./PostImages";
-import { ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST } from "../reducers/post";
+import {
+  ADD_COMMENT_REQUEST,
+  LOAD_COMMENTS_REQUEST,
+  UNLIKE_POST_REQUEST,
+  LIKE_POST_REQUEST
+} from "../reducers/post";
 
 const PostCard = ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -14,6 +19,7 @@ const PostCard = ({ post }) => {
   const { commentAdded, isAddingComment } = useSelector(state => state.post);
   const dispatch = useDispatch();
 
+  const liked = me && post.Likers && post.Likers.find(v => v.id === me.id);
   const onToggleComment = useCallback(() => {
     setCommentFormOpened(prev => !prev);
     if (!commentFormOpened) {
@@ -49,6 +55,22 @@ const PostCard = ({ post }) => {
     setCommentText(e.target.value);
   }, []);
 
+  const onToggleLike = useCallback(() => {
+    if (liked) {
+      // 이미 좋아요 누름
+      dispatch({
+        type: UNLIKE_POST_REQUEST,
+        data: post.id
+      });
+    } else {
+      // 좋아요를 안 누른상태
+      dispatch({
+        type: LIKE_POST_REQUEST,
+        data: post.id
+      });
+    }
+  }, [me && me.id, post && post.id, liked]);
+
   return (
     <div>
       <Card
@@ -56,7 +78,13 @@ const PostCard = ({ post }) => {
         cover={post.Images && <PostImages images={post.Images} />}
         actions={[
           <Icon type="retweet" key="retweet" />,
-          <Icon type="heart" key="heart" />,
+          <Icon
+            type="heart"
+            key="heart"
+            theme={liked ? "twoTone" : "outlined"}
+            twoToneColor="#eb2f96"
+            onClick={onToggleLike}
+          />,
           <Icon type="message" key="message" onClick={onToggleComment} />,
           <Icon type="ellipsis" key="ellipsis" />
         ]}
