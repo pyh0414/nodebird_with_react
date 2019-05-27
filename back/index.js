@@ -16,6 +16,7 @@ const hashtagAPIRouter = require("./routes/hashtag");
 const app = express();
 dotenv.config();
 
+app.use("/", express.static("uploads"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // express.json()과 같이 req.body 데이터를 받을 수 있음
 app.use(morgan("dev"));
