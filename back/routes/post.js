@@ -21,7 +21,7 @@ const upload = multer({
   limits: { fileSize: 20 * 1024 * 1024 }
 });
 
-router.post("/", isLoggedIn, async (req, res, next) => {
+router.post("/", isLoggedIn, upload.none(), async (req, res, next) => {
   try {
     const hashtags = req.body.content.match(/#[^\s]+/g);
     const newPost = await db.Post.create({
@@ -38,6 +38,22 @@ router.post("/", isLoggedIn, async (req, res, next) => {
       );
       await newPost.addHashtags(result.map(r => r[0]));
     }
+
+    if (req.body.image) {
+      // 이미지 주소를 여러개 올리면 image: [주소1, 주소2]
+      if (Array.isArray(req.body.image)) {
+        const images = await Promise.all(
+          req.body.image.map(image => {
+            return db.Image.create({ src: image });
+          })
+        );
+        await newPost.addImages(images);
+      } else {
+        // 이미지를 하나만 올리면 image: 주소1
+        const image = await db.Image.create({ src: req.body.image });
+        await newPost.addImage(image);
+      }
+    }
     // const User = await newPost.getUser();  다른 방법
     // newPost.User = User;
     // res.json(newPost);
@@ -46,7 +62,8 @@ router.post("/", isLoggedIn, async (req, res, next) => {
       include: [
         {
           model: db.User
-        }
+        },
+        { model: db.Image }
       ]
     });
     res.json(fullPost);

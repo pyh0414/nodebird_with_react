@@ -82,7 +82,8 @@ export default (state = initialState, action) => {
         ...state,
         isAddingPost: false,
         mainPosts: [action.data, ...state.mainPosts],
-        postAdded: true
+        postAdded: true,
+        imagePaths: []
       };
     }
     case ADD_POST_FAILURE: {
@@ -175,6 +176,12 @@ export default (state = initialState, action) => {
     case UPLOAD_IMAGES_FAILURE: {
       return {
         ...state
+      };
+    }
+    case REMOVE_IMAGE: {
+      return {
+        ...state,
+        imagePaths: state.imagePaths.filter((v, i) => i !== action.index)
       };
     }
 
