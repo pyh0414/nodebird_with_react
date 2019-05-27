@@ -3,13 +3,9 @@ import { Avatar, Button, Card, Comment, Form, Icon, Input, List } from "antd";
 import Link from "next/link";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  ADD_COMMENT_REQUEST,
-  LIKE_POST_REQUEST,
-  LOAD_COMMENTS_REQUEST,
-  RETWEET_REQUEST,
-  UNLIKE_POST_REQUEST
-} from "../reducers/post";
+
+import PostImages from "./PostImages";
+import { ADD_COMMENT_REQUEST, LOAD_COMMENTS_REQUEST } from "../reducers/post";
 
 const PostCard = ({ post }) => {
   const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -57,7 +53,7 @@ const PostCard = ({ post }) => {
     <div>
       <Card
         key={+post.createdAt}
-        cover={post.img && <img alt="example" src={post.img} />}
+        cover={post.Images && <PostImages images={post.Images} />}
         actions={[
           <Icon type="retweet" key="retweet" />,
           <Icon type="heart" key="heart" />,
