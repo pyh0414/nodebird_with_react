@@ -1,5 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { Avatar, Button, Card, Comment, Form, Icon, Input, List } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Comment,
+  Form,
+  Icon,
+  Input,
+  List,
+  Popover
+} from "antd";
 import Link from "next/link";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
@@ -86,7 +96,23 @@ const PostCard = ({ post }) => {
             onClick={onToggleLike}
           />,
           <Icon type="message" key="message" onClick={onToggleComment} />,
-          <Icon type="ellipsis" key="ellipsis" />
+          <Popover
+            key="ellipsis"
+            content={
+              <Button.Group>
+                {me && me.id === post.UserId ? (
+                  <>
+                    <Button>수정</Button>
+                    <Button type="danger">삭제</Button>
+                  </>
+                ) : (
+                  <Button type="danger">신고</Button>
+                )}
+              </Button.Group>
+            }
+          >
+            <Icon type="ellipsis" key="ellipsis" />
+          </Popover>
         ]}
         extra={<Button>팔로우</Button>}
       >
