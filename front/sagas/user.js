@@ -43,6 +43,8 @@ function* watchLogIn() {
   yield takeEvery(LOG_IN_REQUEST, logIn);
 }
 
+// -----------watch login
+
 function signUpAPI(signUpData) {
   // call함수의 두번째 인자
   // 서버에 요청을 보내는 부분
@@ -70,6 +72,8 @@ function* signUp(action) {
 function* watchSignUp() {
   yield takeEvery(SIGN_UP_REQUEST, signUp);
 }
+
+// -----------watch signup
 
 function logOutAPI() {
   // call함수의 두번째 인자
@@ -105,6 +109,8 @@ function* watchLogOut() {
   yield takeEvery(LOG_OUT_REQUEST, logOut);
 }
 
+// -----------watch logout
+
 function loadUserAPI(userId) {
   // call함수의 두번째 인자
   // 서버에 요청을 보내는 부분
@@ -136,6 +142,8 @@ function* loadUser(action) {
 function* watchLoadUser() {
   yield takeEvery(LOAD_USER_REQUEST, loadUser);
 }
+
+// -----------watch load user
 
 export default function* userSaga() {
   yield all([
