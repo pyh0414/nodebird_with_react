@@ -34,6 +34,7 @@ import {
   UPLOAD_IMAGES_SUCCESS
 } from "../reducers/post";
 
+import { ADD_POST_TO_ME } from "../reducers/user";
 function addPostAPI(postData) {
   return axios.post("/post", postData, {
     withCredentials: true
@@ -44,8 +45,15 @@ function* addPost(action) {
   try {
     const result = yield call(addPostAPI, action.data);
     yield put({
+      // post 리듀서의 데이터를 수정
       type: ADD_POST_SUCCESS,
       data: result.data
+    });
+
+    yield put({
+      // user 리듀서의 데이터를 수정
+      type: ADD_POST_TO_ME,
+      data: result.data.id
     });
   } catch (e) {
     yield put({
@@ -68,6 +76,7 @@ function loadUserPostsAPI(id) {
 function* loadUserPosts(action) {
   try {
     const result = yield call(loadUserPostsAPI, action.data);
+    console.log(result);
     yield put({
       type: LOAD_USER_POSTS_SUCCESS,
       data: result.data
@@ -290,8 +299,40 @@ function* likePost(action) {
 function* watchLikePost() {
   yield takeLatest(LIKE_POST_REQUEST, likePost);
 }
-
 // -----------------------------like Post
+
+function retweetAPI(postId) {
+  return axios.post(
+    `/post/${postId}/retweet`,
+    {},
+    {
+      withCredentials: true
+    }
+  );
+}
+
+function* retweet(action) {
+  try {
+    const result = yield call(retweetAPI, action.data);
+    yield put({
+      type: RETWEET_SUCCESS,
+      data: result.data
+    });
+  } catch (e) {
+    console.error(e);
+    yield put({
+      type: RETWEET_FAILURE,
+      error: e
+    });
+    alert(e.response && e.response.data);
+  }
+}
+
+function* watchRetweet() {
+  yield takeLatest(RETWEET_REQUEST, retweet);
+}
+
+// -----------------------------Retweet
 
 export default function* postSaga() {
   yield all([
@@ -302,8 +343,8 @@ export default function* postSaga() {
     fork(watchAddComment),
     fork(watchLoadComments),
     fork(watchUploadImages),
-
     fork(watchLikePost),
-    fork(watchUnlikePost)
+    fork(watchUnlikePost),
+    fork(watchRetweet)
   ]);
 }
