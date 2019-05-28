@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
+import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
-import ProtoType from "prop-types";
 import { Avatar, Card } from "antd";
-
-import PostCard from "../components/PostCard";
 import { LOAD_USER_POSTS_REQUEST } from "../reducers/post";
 import { LOAD_USER_REQUEST } from "../reducers/user";
+import PostCard from "../components/PostCard";
 
 const User = ({ id }) => {
   const dispatch = useDispatch();
   const { mainPosts } = useSelector(state => state.post);
   const { userInfo } = useSelector(state => state.user);
+
   useEffect(() => {
     dispatch({
       type: LOAD_USER_REQUEST,
@@ -49,21 +49,20 @@ const User = ({ id }) => {
           />
         </Card>
       ) : null}
-      {mainPosts.map(c => {
-        <PostCard key={+c.createAt} post={c} />;
-      })}
+      {mainPosts.map(c => (
+        <PostCard key={+c.createdAt} post={c} />
+      ))}
     </div>
   );
 };
 
-User.prototype = {
-  id: ProtoType.number.isRequired
+User.propTypes = {
+  id: PropTypes.number.isRequired
 };
+
 User.getInitialProps = async context => {
-  // context : __app.js에서 ctx가 넘어온 것
-  // getInitialProps : next에서 제공해줌
-  return {
-    id: parseInt(context.query.id) // User컴포넌에게 props로 넘겨주는 부분
-  };
+  console.log("user getInitialProps", context.query.id);
+  return { id: parseInt(context.query.id, 10) };
 };
+
 export default User;

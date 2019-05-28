@@ -4,24 +4,55 @@ const router = express.Router();
 
 router.get("/:tag", async (req, res, next) => {
   try {
+    let where = {};
+    if (parseInt(req.query.lastId, 10)) {
+      where = {
+        id: {
+          [db.Sequelize.Op.lt]: parseInt(req.query.lastId, 10)
+        }
+      };
+    }
     const posts = await db.Post.findAll({
+      where,
       include: [
         {
           model: db.Hashtag,
-          where: {
-            name: decodeURIComponent(req.params.tag)
-            // 한글, 특수문제 이런 얘들은 주소를 통해서 서버로 갈때는 URIComponent로 바뀌기 때문에
-            // 받을때 다시 해독해주어야함
-          }
+          where: { name: decodeURIComponent(req.params.tag) }
         },
-        { model: db.User, attributes: ["id", "nickname"] }
-      ]
+        {
+          model: db.User,
+          attributes: ["id", "nickname"]
+        },
+        {
+          model: db.Image
+        },
+        {
+          model: db.User,
+          through: "Like",
+          as: "Likers",
+          attributes: ["id"]
+        },
+        {
+          model: db.Post,
+          as: "Retweet",
+          include: [
+            {
+              model: db.User,
+              attributes: ["id", "nickname"]
+            },
+            {
+              model: db.Image
+            }
+          ]
+        }
+      ],
+      order: [["createdAt", "DESC"]]
     });
-
     res.json(posts);
-  } catch (err) {
-    console.error(err);
-    next(err);
+  } catch (e) {
+    console.error(e);
+    next(e);
   }
 });
+
 module.exports = router;
