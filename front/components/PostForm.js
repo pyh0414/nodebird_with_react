@@ -91,7 +91,7 @@ const PostForm = () => {
           htmlType="submit"
           loading={isAddingPost}
         >
-          쨱짹
+          짹짹
         </Button>
       </div>
       <div>
