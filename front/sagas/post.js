@@ -1,4 +1,4 @@
-import { all, fork, takeLatest, put, call } from "redux-saga/effects";
+import { all, fork, takeLatest, put, call, throttle } from "redux-saga/effects";
 import axios from "axios";
 
 import {
@@ -98,13 +98,15 @@ function* watchLoadUserPosts() {
 
 // -----------------------------loadUserPosts
 
-function loadHashtagPostsAPI(tag) {
-  return axios.get(`/hashtag/${encodeURIComponent(tag)}`);
+function loadHashtagPostsAPI(tag, lastId) {
+  return axios.get(
+    `/hashtag/${encodeURIComponent(tag)}?lastId=${lastId}&limit=10`
+  );
 }
 
 function* loadHashtagPosts(action) {
   try {
-    const result = yield call(loadHashtagPostsAPI, action.data);
+    const result = yield call(loadHashtagPostsAPI, action.data, action.lastId);
     yield put({
       type: LOAD_HASHTAG_POSTS_SUCCESS,
       data: result.data
@@ -117,19 +119,19 @@ function* loadHashtagPosts(action) {
   }
 }
 
-function* watchLoadHashtagsPosts() {
+function* watchLoadHashtagPosts() {
   yield takeLatest(LOAD_HASHTAG_POSTS_REQUEST, loadHashtagPosts);
 }
 
 // -----------------------------loadHashPosts
 
-function loadMainPostsAPI() {
-  return axios.get("/posts");
+function loadMainPostsAPI(lastId = 0, limit = 10) {
+  return axios.get(`/posts?lastId=${lastId}&limit=${limit}`);
 }
 
-function* loadMainPosts() {
+function* loadMainPosts(action) {
   try {
-    const result = yield call(loadMainPostsAPI);
+    const result = yield call(loadMainPostsAPI, action.lastId);
     yield put({
       type: LOAD_MAIN_POSTS_SUCCESS,
       data: result.data
@@ -143,7 +145,7 @@ function* loadMainPosts() {
 }
 
 function* watchLoadMainPosts() {
-  yield takeLatest(LOAD_MAIN_POSTS_REQUEST, loadMainPosts);
+  yield throttle(2000, LOAD_MAIN_POSTS_REQUEST, loadMainPosts);
 }
 
 // -----------------------------loadMainPosts
@@ -374,7 +376,7 @@ export default function* postSaga() {
     fork(watchLoadMainPosts),
     fork(watchAddPost),
     fork(watchLoadUserPosts),
-    fork(watchLoadHashtagsPosts),
+    fork(watchLoadHashtagPosts),
     fork(watchAddComment),
     fork(watchLoadComments),
     fork(watchUploadImages),
