@@ -4,9 +4,12 @@ import PropsTypes from "prop-types";
 import withRedux from "next-redux-wrapper";
 import { createStore, applyMiddleware, compose } from "redux";
 import { Provider } from "react-redux";
+import withReduxSaga from "next-redux-saga";
 import createSagaMiddleware from "redux-saga";
+import axios from "axios";
 
-import rootReducer from "../reducers";
+import { LOAD_USER_REQUEST } from "../reducers/user";
+import reducer from "../reducers";
 import AppLayout from "../components/AppLayout";
 import rootSaga from "../sagas";
 
@@ -53,16 +56,29 @@ NodeBird.getInitialProps = async context => {
   // context는 next에서 내려주는 얘
   const { ctx, Component } = context;
   let pageProps = {};
+  const state = ctx.store.getState();
+  const cookie = ctx.isServer ? ctx.req.headers.cookie : ""; // ctx.req,ctx.res는 서버환경일때만 있는 객체
+  if (ctx.isServer && cookie) {
+    // ssr은 서버,프론트에서 둘 다 실행되는데, 만약 서버환경이면 쿠키를 임의로 넣어줌, 클라이언트의 경우는 브라우저가 알아서 넣어주기 때문에 상관없음
+    axios.defaults.headers.Cookie = cookie;
+  }
+  if (!state.user.me) {
+    ctx.store.dispatch({
+      type: LOAD_USER_REQUEST
+    });
+  }
+
   if (Component.getInitialProps) {
     // hashtag컴포넌트에 getInitialProps이 있으면 실행
-    pageProps = await Component.getInitialProps(ctx); // hashtag에서 return 한 값이 pageProps에 들어감:tag
+    pageProps = (await Component.getInitialProps(ctx)) || {}; // hashtag에서 return 한 값이 pageProps에 들어감:tag
   }
+
   return { pageProps }; // 다시 NodeBird의 props로 전달
 };
 
-export default withRedux((initialState, options) => {
+const configureStore = (initialState, options) => {
   const sagaMiddleware = createSagaMiddleware();
-  const middlewares = [sagaMiddleware]; // 추가하려는 middleware를 배열에 넣으면됨
+  const middlewares = [sagaMiddleware];
   const enhancer =
     process.env.NODE_ENV === "production"
       ? compose(applyMiddleware(...middlewares))
@@ -73,7 +89,9 @@ export default withRedux((initialState, options) => {
             ? window.__REDUX_DEVTOOLS_EXTENSION__()
             : f => f
         );
-  const store = createStore(rootReducer, initialState, enhancer);
-  sagaMiddleware.run(rootSaga);
+  const store = createStore(reducer, initialState, enhancer);
+  store.sagaTask = sagaMiddleware.run(rootSaga);
   return store;
-})(NodeBird); // withRedux를 사용해서 nodeBird에 sotre를 넣어주는 부분
+};
+
+export default withRedux(configureStore)(withReduxSaga(NodeBird));

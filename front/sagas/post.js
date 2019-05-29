@@ -70,13 +70,12 @@ function* watchAddPost() {
 // -----------------------------addPost
 
 function loadUserPostsAPI(id) {
-  return axios.get(`/user/${id}/posts`);
+  return axios.get(`/user/${id || 0}/posts`);
 }
 
 function* loadUserPosts(action) {
   try {
     const result = yield call(loadUserPostsAPI, action.data);
-    console.log(result);
     yield put({
       type: LOAD_USER_POSTS_SUCCESS,
       data: result.data
@@ -96,7 +95,7 @@ function* watchLoadUserPosts() {
 // -----------------------------loadUserPosts
 
 function loadHashtagPostsAPI(tag) {
-  return axios.get(`/hashtag/${tag}`);
+  return axios.get(`/hashtag/${encodeURIComponent(tag)}`);
 }
 
 function* loadHashtagPosts(action) {

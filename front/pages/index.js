@@ -6,14 +6,9 @@ import PostCard from "../components/PostCard";
 import { LOAD_MAIN_POSTS_REQUEST } from "../reducers/post";
 
 const Home = () => {
-  const dispatch = useDispatch();
   const { me } = useSelector(state => state.user); // user가 변경되면 Home컴포넌트도 re-rendering되기 떄문에, 최대한 나눠줘야함
   const { mainPosts } = useSelector(state => state.post);
-  useEffect(() => {
-    dispatch({
-      type: LOAD_MAIN_POSTS_REQUEST
-    });
-  }, []);
+
   return (
     <div>
       {me && <PostForm />}
@@ -22,6 +17,13 @@ const Home = () => {
       })}
     </div>
   );
+};
+
+Home.getInitialProps = context => {
+  // __app.js에서 넣어준 ctx
+  context.store.dispatch({
+    type: LOAD_MAIN_POSTS_REQUEST
+  });
 };
 
 export default Home;
