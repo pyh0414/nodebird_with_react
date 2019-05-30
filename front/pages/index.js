@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 import PostForm from "../components/PostForm";
@@ -10,6 +10,7 @@ const Home = () => {
   const { mainPosts, hasMorePost } = useSelector(state => state.post);
 
   const dispatch = useDispatch();
+  const countRef = useRef([]);
 
   const onScroll = useCallback(() => {
     if (
@@ -17,10 +18,14 @@ const Home = () => {
       document.documentElement.scrollHeight - 300
     ) {
       if (hasMorePost) {
-        dispatch({
-          type: LOAD_MAIN_POSTS_REQUEST,
-          lastId: mainPosts[mainPosts.length - 1].id
-        });
+        const lastId = mainPosts[mainPosts.length - 1].id;
+        if (!countRef.current.includes(lastId)) {
+          dispatch({
+            type: LOAD_MAIN_POSTS_REQUEST,
+            lastId
+          });
+          countRef.current.push(lastId);
+        }
       }
     }
   }, [hasMorePost, mainPosts.length]);
