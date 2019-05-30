@@ -1,11 +1,12 @@
 import React from "react";
-import Head from "next/head";
 import PropsTypes from "prop-types";
 import withRedux from "next-redux-wrapper";
 import { createStore, applyMiddleware, compose } from "redux";
 import { Provider } from "react-redux";
 import withReduxSaga from "next-redux-saga";
 import createSagaMiddleware from "redux-saga";
+import Helmet from "react-helmet";
+import { Container } from "next/app";
 import axios from "axios";
 
 import { LOAD_USER_REQUEST } from "../reducers/user";
@@ -17,31 +18,75 @@ const NodeBird = ({ Component, store, pageProps }) => {
   // compoenent가 index,profile,signup을 모두 포함하고 있음
   return (
     <>
-      <Provider store={store}>
-        <Head>
-          <title>NodeBird</title>
-          <link
-            rel="stylesheet"
-            href="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css"
+      <Container>
+        <Provider store={store}>
+          <Helmet
+            title="NodeBird"
+            htmlAttributes={{ lang: "ko" }}
+            meta={[
+              {
+                charset: "UTF-8"
+              },
+              {
+                name: "viewport",
+                content:
+                  "width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=yes,viewport-fit=cover"
+              },
+              {
+                "http-equiv": "X-UA-Compatible",
+                content: "IE=edge"
+              },
+              {
+                name: "description",
+                content: "제로초의 NodeBird SNS"
+              },
+              {
+                name: "og:title",
+                content: "NodeBird"
+              },
+              {
+                name: "og:description",
+                content: "제로초의 NodeBird SNS"
+              },
+              {
+                property: "og:type",
+                content: "website"
+              }
+            ]}
+            link={[
+              {
+                rel: "shortcut icon",
+                href: "/favicon.ico"
+              },
+              {
+                rel: "stylesheet",
+                href:
+                  "https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.css"
+              },
+              {
+                rel: "stylesheet",
+                href:
+                  "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
+              },
+              {
+                rel: "stylesheet",
+                href:
+                  "https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
+              }
+            ]}
+            script={[
+              {
+                src:
+                  "https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.js"
+              }
+            ]}
           />
-          <script src="https://cdnjs.cloudflare.com/ajax/libs/antd/3.16.2/antd.js" />
-          <link
-            rel="stylesheet"
-            type="text/css"
-            charSet="UTF-8"
-            href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
-          />
-          <link
-            rel="stylesheet"
-            type="text/css"
-            href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
-          />
-        </Head>
-        <AppLayout>
-          <Component {...pageProps} />
-          {/* hashtag의 props로 전달됨 */}
-        </AppLayout>
-      </Provider>
+          <AppLayout>
+            <Component {...pageProps} />
+            {/* hashtag의 props로 전달됨 */}
+          </AppLayout>
+        </Provider>
+      </Container>
     </>
   );
 };
