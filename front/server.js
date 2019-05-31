@@ -4,6 +4,7 @@ const cookieParser = require("cookie-parser");
 const expressSession = require("express-session");
 const next = require("next");
 const dotenv = require("dotenv");
+const path = require("path");
 
 const dev = process.env.NODE_DEV !== "development";
 const prod = process.env.NODE_DEV === "production";
@@ -18,6 +19,7 @@ app.prepare().then(() => {
   server.use(express.json());
   server.use(express.urlencoded({ extended: true }));
   server.use(cookieParser(process.env.COOKIE_SECRET));
+  server.use("/", express.static(path.join(__dirname, "public")));
   server.use(
     expressSession({
       resave: false,

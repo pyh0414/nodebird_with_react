@@ -2,7 +2,7 @@ import React, { useCallback, useEffect } from "react";
 import PropTypes from "prop-types";
 import { useDispatch, useSelector } from "react-redux";
 import { LOAD_HASHTAG_POSTS_REQUEST } from "../reducers/post";
-import PostCard from "../components/PostCard";
+import PostCard from "../containers/PostCard";
 
 const Hashtag = ({ tag }) => {
   const dispatch = useDispatch();
@@ -17,7 +17,9 @@ const Hashtag = ({ tag }) => {
       if (hasMorePost) {
         dispatch({
           type: LOAD_HASHTAG_POSTS_REQUEST,
-          lastId: mainPosts[mainPosts.length - 1].id,
+          lastId:
+            mainPosts[mainPosts.length - 1] &&
+            mainPosts[mainPosts.length - 1].id,
           data: tag
         });
       }
