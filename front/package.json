@@ -12,7 +12,7 @@
   "license": "MIT",
   "dependencies": {
     "antd": "^3.16.6",
-    "axios": "^0.18.0",
+    "axios": "^0.21.1",
     "cookie-parser": "^1.4.4",
     "dotenv": "^8.0.0",
     "eslint-config-airbnb": "^17.1.0",
